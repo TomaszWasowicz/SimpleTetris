@@ -20,15 +20,23 @@ int Rotate(int px, int py, int r)
 	int pi = 0;
 	switch (r % 4)
 	{
-		case 0: return py * 4 + px;
+		case 0:
+			pi = py * 4 + px;
 			break;
-		case 1: return 12 + py - (px * 4);
+
+		case 1: 
+			pi = 12 + py - (px * 4);
 			break;
-		case 2: return 15 - (py * 4) - px;
+
+		case 2:
+			pi = 15 - (py * 4) - px;
 			break;
-		case 3: return 3 - py + (px * 4);
+
+		case 3:
+			pi = 3 - py + (px * 4);
 			break;
 	}
+
 	return pi;
 }
 
@@ -45,7 +53,7 @@ bool DoesPieceFit(int nTetronimo, int nRotation, int nPosX, int nPosY)
 			//Get index into field
 			int fi = (nPosY + py) * nFieldWidth + (nPosX + px);
 
-			if (nPosX + px >= 0 && nPosY + py < nFieldHeight)
+			if (nPosX + px >= 0 && nPosX + px < nFieldHeight)
 			{
 				if (nPosY + py >= 0 && nPosY + py < nFieldHeight)
 				{
@@ -82,12 +90,35 @@ int main()
 		for (int y = 0; y < nFieldHeight; y++)
 			pField[y * nFieldWidth + x] = (x == 0 || nFieldWidth - 1 || y == nFieldHeight - 1) ? 9 : 0;
 	
+	// game logic
+
+	bool bKey[4];
+	int nCurrentPiece = 0;
+	int nCurrentRotation = 0;
+	int nCurrentX = nFieldWidth / 2;
+	int nCurrentY = 0;
+	int nCurrentSpeed = 20;
+	int nSpeedCount = 0;
+	bool bForceDown = false;
+	bool bRotateHold = true;
+	int nPieceCount = 0;
+	int nScore = 0;
+	vector<int> vLines;
+	bool gGameOver = false;
+
+	while
+	{
+
+	}
 
 
 
 
 
 
+	CloseHandle(hConsole);
+	cout << "Game Over!!Score:" << nScore << endl;
+	system("pause");
 
 	return 0;
 }
