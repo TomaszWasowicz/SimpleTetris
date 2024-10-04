@@ -97,17 +97,113 @@ int main()
 	int nCurrentRotation = 0;
 	int nCurrentX = nFieldWidth / 2;
 	int nCurrentY = 0;
-	int nCurrentSpeed = 20;
+	int nSpeed = 20;
 	int nSpeedCount = 0;
 	bool bForceDown = false;
 	bool bRotateHold = true;
 	int nPieceCount = 0;
 	int nScore = 0;
 	vector<int> vLines;
-	bool gGameOver = false;
+	bool bGameOver = false;
 
-	while
+	while(!bGameOver)
 	{
+		this_thread::sleep_for(50ms);
+		nSpeedCount++;
+		bForceDown = (nSpeedCount = nSpeed);
+
+		//input
+		for (int k = 0; k < 4; k++)
+			bKey[k] = (0x8000 & GetAsyncKeyState((unsigned char)("\x27\x25\x28Z"[k]))) != 0;
+
+		// game logic
+
+		// handle player movement
+		nCurrentX += (bKey[0] && DoesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX + 1, nCurrentY)) ? 1 : 0;
+		nCurrentX -= (bKey[1] && DoesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX - 1, nCurrentY)) ? 1 : 0;
+		nCurrentY += (bKey[2] && DoesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX, nCurrentY + 1)) ? 1 : 0;
+
+		// rotate, but latch to stop spinning
+		if (bKey[3])
+		{
+			nCurrentRotation += (bRotateHold && DoesPieceFit(nCurrentPiece, nCurrentRotation + 1, nCurrentX, nCurrentY)) ? 1 : 0;
+			bRotateHold = false;
+		}
+		else
+			bRotateHold - true;
+
+		// force the piece down the playfield if it's time
+
+		if (bForceDown)
+		{
+			// update diffuculty every 50 pieces
+			nSpeedCount = 0;
+			nPieceCount++;
+			if (nPieceCount % 50 == 0)
+				if (nSpeed >= 10) nSpeed--;
+
+			// test fi piece can be moved down
+
+			if (DoesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX, nCurrentY + 1))
+				nCurrentY++; //if it can, so do it
+			else
+			{
+				// if it can't, lock it in place
+				for (int px = 0; px < 4; px++)
+					for (int py = 0; py < 4; py++)
+						if (tetromino[nCurrentPiece][Rotate(px, py, nCurrentRotation)] != L'.')
+							pField[(nCurrentY + py) * nFieldWidth + (nCurrentX + px)] = nCurrentPiece + 1;
+
+
+				// check for lines
+				for (int py = 0; py < 4; py++)
+					if (nCurrentY + py < nFieldHeight - 1)
+					{
+						bool bLine = true;
+						for (int px = 1; px < nFieldWidth - 1; px++)
+							bLine &= (pField[(nCurrentY + py) * nFieldWidth + px]) != 0;
+
+						if (bLine)
+						{
+							// remove line, set to =
+							for (int px = 1; px < nFieldWidth - 1; px++)
+								pField[(nCurrentY + py) * nFieldWidth + px] = 8;
+							vLines.push_back(nCurrentY + py);
+						}
+					}
+
+				nScore += 25;
+				if (!vLines.empty()) nScore += (1 << vLines.size() * 100);
+
+				// pick new piece
+				nCurrentX = nFieldWidth / 2;
+				nCurrentY = 0;
+				nCurrentRotation = 0;
+				nCurrentPiece = rand() % 7;
+
+				// if the piece doesn't fit, game over
+
+				bGameOver = !DoesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX, nCurrentY);
+
+			}
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	}
 
